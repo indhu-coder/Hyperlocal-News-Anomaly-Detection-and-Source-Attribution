@@ -59,6 +59,30 @@ Here comes the coding part:
 
       📊 Data Preprocessing
       
+    import pandas as pd
+    import numpy as np
+    import nltk
+    from nltk.tokenize import word_tokenize
+    from nltk.corpus import stopwords
+    from nltk.stem import WordNetLemmatizer
+    import spacy
+    import re
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    from sklearn.ensemble import IsolationForest
+    from prophet import Prophet
+    from xgboost import XGBClassifier
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import LabelEncoder
+    from sklearn.metrics import classification_report
+    import numpy as np
+    from sklearn.preprocessing import StandardScaler
+    from bertopic import BERTopic
+
+    
+      nltk.download('punkt_tab')
+      nltk.download('stopwords')
+      nltk.download('wordnet')
       df['Article'] = df['Article'].str.lower()
       df['Heading'] = df['Heading'].str.lower()
       df['date'] = pd.to_datetime(df['Date'])
@@ -104,6 +128,30 @@ Here comes the coding part:
       model = SentenceTransformer("all-mpnet-base-v2")
       
       df['embedding'] = df['combined_text'].apply(lambda x: model.encode(x))
+
+🔵 BERTopic (Topic Extraction)
+
+    texts = df["combined_text"].tolist()
+    topic_model = BERTopic()
+    topics, probs = topic_model.fit_transform(texts)
+    
+    df["topic"] = topics
+    
+    # Topic frequency
+    
+    topic_counts = df['topic'].value_counts()
+    df['topic_freq'] = df['topic'].map(topic_counts)
+    
+    # Rare topic = anomaly
+    df['topic_anomaly'] = df['topic_freq'] < 5
+
+    topics_over_time = topic_model.topics_over_time(
+    texts,
+    df["date"],
+    nr_bins=20
+    )
+    fig = topic_model.visualize_topics()
+    fig.show()
       
 🔍 Linguistic Anomaly Detection (Hybrid)
       
@@ -348,11 +396,101 @@ which implies
 
 - Base Accuracy: 64%
 
+- Weighted F1-score: 0.64
+
 - Filtered Accuracy: 73.6%
 
 - Coverage: 71.9%
 
 - Insight: Model is reliable for majority of predictions while safely flagging uncertain cases.
+
+
+📊 Visualization
+
+1. Anomaly Distribution
+
+        # flag low confidence OR mismatch
+        df['source_flag'] = (df['source_discrepancy']) | (df['confidence'] < 0.5)
+        
+        df[df['source_flag'] == 1][['Heading', 'location', 'predicted_location', 'confidence']].head(10)
+        
+        df['source_flag'].value_counts().plot(kind='bar')
+        plt.title("Source Discrepancy Count")
+        plt.show()
+
+   <img width="1280" height="612" alt="Source flag" src="https://github.com/user-attachments/assets/a17765a8-3a08-4847-abc9-45fd54a18937" />
+
+2. Top Anomalies
+
+             top = df.sort_values(by='final_score', ascending=False).head(10)
+             plt.figure(figsize=(10,6))
+             plt.barh(top['Heading'], top['final_score'])
+             plt.gca().invert_yaxis()
+             plt.title("Top 10 Anomalous News Articles")
+             plt.xlabel("Final Anomaly Score")
+             plt.tight_layout()
+             plt.show()
+
+   <img width="1000" height="600" alt="Top 10 anomalous score after tuning" src="https://github.com/user-attachments/assets/88c1a7b8-488c-4cd1-9567-78d645db8395" />
+
+3. Temporal Trends
+          
+            plt.figure(figsize=(10,5))
+            plt.plot(df['date'], df['final_score'], label='Anomaly Score')
+            anomalies = df[df['prophet_score'].abs() > 2.5]
+            plt.scatter(anomalies['date'], anomalies['final_score'], marker='x')
+            plt.title("Temporal Anomaly Detection")
+            plt.xlabel("Date")
+            plt.ylabel("Anomaly Score")
+            plt.tight_layout()
+            plt.show()
+
+   <img width="1000" height="500" alt="Temporal anomaly detection after tuning" src="https://github.com/user-attachments/assets/8d1999cb-a7f3-4124-b7db-91f6ac3d5cdd" />
+
+
+4. Anomaly Type Distribution
+
+        def anomaly_type(row):
+            if row['location'] != row['predicted_location'] and row['confidence'] > 0.7:
+                return "Strong Mismatch"
+            elif row['confidence'] < 0.6:
+                return "Low Confidence"
+            else:
+                return "Normal"
+        
+        df['anomaly_type'] = df.apply(anomaly_type, axis=1)
+        counts = df['anomaly_type'].value_counts()
+        plt.figure(figsize=(8,5))
+        counts.plot(kind='bar')
+        plt.title("Anomaly Type Distribution")
+        plt.xlabel("Type")
+        plt.ylabel("Count")
+        plt.xticks(rotation=20)
+        plt.tight_layout()
+        plt.show()
+
+   <img width="800" height="500" alt="Anomaly type distribution after tuning" src="https://github.com/user-attachments/assets/2e01a86e-ca69-4c0c-8444-95f731810821" />
+
+5.Top locations by Average Anomaly score
+
+        location_anomalies = df.groupby('location')['anomaly_score_norm'].mean().sort_values(ascending=False)
+        
+        plt.figure(figsize=(10, 6))
+        location_anomalies.head(10).plot(kind='bar')
+        plt.title('Top Locations by Average Anomaly Score')
+        plt.ylabel('Average Anomaly Score')
+        plt.xlabel('Location')
+        
+        plt.tight_layout()
+        plt.show()
+
+<img width="1280" height="612" alt="top location anomaly" src="https://github.com/user-attachments/assets/0365f503-aa00-4918-8161-09b1e613ce59" />
+
+
+
+
+
+
 
      
     
