@@ -157,7 +157,12 @@ Here comes the coding part:
     fig3 = topic_model.visualize_topics_over_time(topics_over_time)
     fig3.show()
 
-The results are stored seperately in the main file.
+The results 
+
+<img width="450" height="450" alt="image" src="https://github.com/user-attachments/assets/0957cc66-5c0e-4a9d-90f7-5b78fe3b1353" />
+
+
+
 
 🔍 Linguistic Anomaly Detection (Hybrid)
       
