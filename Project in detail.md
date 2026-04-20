@@ -105,7 +105,7 @@ Here comes the coding part:
       
       df['embedding'] = df['combined_text'].apply(lambda x: model.encode(x))
       
-      🔍 Linguistic Anomaly Detection (Hybrid)
+🔍 Linguistic Anomaly Detection (Hybrid)
       
       from sklearn.ensemble import IsolationForest
       from sentence_transformers.util import cos_sim
