@@ -144,15 +144,21 @@ Here comes the coding part:
     
     # Rare topic = anomaly
     df['topic_anomaly'] = df['topic_freq'] < 5
-
-    topics_over_time = topic_model.topics_over_time(
-    texts,
-    df["date"],
-    nr_bins=20
-    )
     fig = topic_model.visualize_topics()
     fig.show()
-      
+    fig2 = topic_model.visualize_barchart()
+    fig2.show()
+    
+    topics_over_time = topic_model.topics_over_time(
+        texts,
+        df["date"],nr_bins=20
+    )
+    
+    fig3 = topic_model.visualize_topics_over_time(topics_over_time)
+    fig3.show()
+
+The results are stored seperately in the main file.
+
 🔍 Linguistic Anomaly Detection (Hybrid)
       
       from sklearn.ensemble import IsolationForest
