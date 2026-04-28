@@ -125,7 +125,7 @@ Here comes the coding part:
       
       from sentence_transformers import SentenceTransformer
       
-      model = SentenceTransformer("all-mpnet-base-v2")
+      model = SentenceTransformer("all-MiniLM-L6-v2")
       
       df['embedding'] = df['combined_text'].apply(lambda x: model.encode(x))
 
@@ -310,11 +310,10 @@ The results are attached seperatly.
           
           scaler = StandardScaler()
           X = scaler.fit_transform(X)
-          y = df['location']
           le = LabelEncoder()
-          y_encoded = le.fit_transform(y)
+          y = le.fit_transform(df['location'])
           X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(
-              X, y_encoded, df.index, test_size=0.2, random_state=42
+              X, y, df.index, test_size=0.2, random_state=42,stratify=y
           )
           # Model Training
           
@@ -344,20 +343,22 @@ The results are attached seperatly.
 
 The report is as follows:
       
-                     precision    recall  f1-score   support
-      
-                 0       0.53      0.42      0.47        24
-                 1       0.86      0.46      0.60        13
-                 2       0.76      0.82      0.79        74
-                 3       0.35      0.35      0.35        17
-                 4       0.62      0.55      0.58        29
-                 5       0.46      0.59      0.52        29
-                 6       0.73      0.85      0.79        13
-                 7       0.75      0.68      0.71        22
-      
-          accuracy                           0.64       221
-         macro avg       0.63      0.59      0.60       221
-      weighted avg       0.65      0.64      0.64       221
+                      precision    recall  f1-score   support
+    
+               0       0.59      0.54      0.57        24
+               1       0.67      0.22      0.33         9
+               2       0.71      0.62      0.66        39
+               3       0.60      0.40      0.48        15
+               4       0.63      0.65      0.64        34
+               5       0.69      0.67      0.68        30
+               6       0.67      0.85      0.75        48
+               7       0.63      0.86      0.73        14
+    
+        accuracy                           0.66       213
+       macro avg       0.65      0.60      0.60       213
+    weighted avg       0.66      0.66      0.65       213
+
+
 
     # Prediction + Confidence
     
@@ -394,19 +395,19 @@ The report is as follows:
 
 The result is
 
-Filtered Accuracy: 0.7358490566037735
+Filtered Accuracy: 0.7730496453900709
 
-Coverage: 0.7194570135746606
+Coverage: 0.6619718309859155
 
 which implies 
 
-- Base Accuracy: 64%
+- Base Accuracy: 66%
 
-- Weighted F1-score: 0.64
+- Weighted F1-score: 0.65
 
-- Filtered Accuracy: 73.6%
+- Filtered Accuracy: 77.3%
 
-- Coverage: 71.9%
+- Coverage: 66.19%
 
 - Insight: Model is reliable for majority of predictions while safely flagging uncertain cases.
 
