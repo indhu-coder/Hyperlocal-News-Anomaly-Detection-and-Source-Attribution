@@ -80,54 +80,90 @@ Here comes the coding part:
     from bertopic import BERTopic
 
     
-      nltk.download('punkt_tab')
-      nltk.download('stopwords')
-      nltk.download('wordnet')
-      df['Article'] = df['Article'].str.lower()
-      df['Heading'] = df['Heading'].str.lower()
-      df['date'] = pd.to_datetime(df['Date'])
-      df['NewsType'] = df['NewsType'].astype('category')
-      stop_words = set(stopwords.words('english'))
-      lemmatizer = WordNetLemmatizer()
-      df['Article'] = df['Article'].apply(lambda x: re.sub(r'[^\w\s]', '', str(x)))
-      df['tokens'] = df['Article'].apply(word_tokenize)
-    
-      df['tokens_headings'] = df['Heading'].apply(word_tokenize)
-      df['tokens'] = df['tokens'].apply(
-          lambda x: [word for word in x if word.isalpha() and word not in stop_words]
-      )
-    
-      df['tokens'] = df['tokens'].apply(lambda x: [lemmatizer.lemmatize(word) for word in x])
-      
-      # Display the preprocessed tokens
-      df['clean_text'] = df['tokens'].apply(lambda x: " ".join(x))
-      nlp = spacy.load("en_core_web_md")
-      def extract_named_entities(text):
-          doc = nlp(text)
-          return [ent.text for ent in doc.ents]
-      def label_extraction(text):
-          doc = nlp(text)
-          labels = [ent.label_ for ent in doc.ents]
-          return list(set(labels))
-      def location_extraction(text):
-          doc = nlp(text)
-          locations = [ent.text.lower() for ent in doc.ents if ent.label_ in ["GPE","LOC"]]
-          # remove numbers and duplicates
-          locations = [loc for loc in locations if not any(char.isdigit() for char in loc)]
-          
-          return list(set(locations))
-      df['named_entities'] = df['Article'].apply(extract_named_entities)
-      df['Newstype'] = df['Article'].apply(label_extraction)
-      df['location'] = df['Article'].apply(location_extraction)
-      df["combined_text"] = df["Heading"] + "[SEP]" + df["Article"]
-      
-      🧠 Embedding Generation
-      
-      from sentence_transformers import SentenceTransformer
-      
-      model = SentenceTransformer("all-MiniLM-L6-v2")
-      
-      df['embedding'] = df['combined_text'].apply(lambda x: model.encode(x))
+            # -------------------------------
+        # 1. LOAD DATA
+        # -------------------------------
+        df = pd.read_csv("Articles.csv", encoding="latin1")
+        
+        # -------------------------------
+        # 2. BASIC CLEANING
+        # -------------------------------
+        df.columns = df.columns.str.strip()
+        
+        df['Article'] = df['Article'].fillna("").str.lower()
+        df['Heading'] = df['Heading'].fillna("").str.lower()
+        
+        df['date'] = pd.to_datetime(df['Date'], errors='coerce')
+        
+        # Combine text ONCE
+        df['text'] = df['Heading'] + " " + df['Article']
+        
+        # Remove special characters
+        df['text'] = df['text'].apply(lambda x: re.sub(r'[^\w\s]', '', x))
+        
+        # -------------------------------
+        # 3. LOAD SPACY MODEL
+        # -------------------------------
+        nlp = spacy.load("en_core_web_md")  
+        
+        # -------------------------------
+        # 4. LOCATION EXTRACTION
+        # -------------------------------
+        def extract_location(text):
+            doc = nlp(text)
+            locs = [ent.text.lower() for ent in doc.ents if ent.label_ in ["GPE", "LOC"]]
+        
+            locs = [l for l in locs if not any(c.isdigit() for c in l)]
+        
+            return locs[0] if locs else "unknown"
+        
+        df['location'] = df['text'].apply(extract_location)
+        
+        # -------------------------------
+        # 5. NORMALIZE LOCATION (CRITICAL)
+        # -------------------------------
+        def normalize_location(x):
+            x = str(x).lower()
+        
+            if "karachi" in x or "pakistan" in x:
+                return "pakistan"
+        
+            if "england" in x or "uk" in x or "london" in x:
+                return "uk"
+        
+            if "texas" in x or "usa" in x or "united states" in x:
+                return "usa"
+        
+            if "west indies" in x:
+                return "west indies"
+        
+            if "south africa" in x:
+                return "south africa"
+        
+            if "saudi" in x:
+                return "saudi arabia"
+        
+            return "unknown"
+        
+        df['location'] = df['location'].apply(normalize_location)
+        
+        # -------------------------------
+        # 6. REMOVE NOISE
+        # -------------------------------
+        df = df[df['location'] != "unknown"]
+        
+        # Remove rare classes
+        min_samples = 20
+        counts = df['location'].value_counts()
+        valid = counts[counts >= min_samples].index
+        df = df[df['location'].isin(valid)]
+        
+        # -------------------------------
+        # 7. EMBEDDINGS (ONLY ONCE)
+        # -------------------------------
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+        
+        df['embedding'] = list(model.encode(df['text'].tolist(), show_progress_bar=True))
 
 🔵 BERTopic (Topic Extraction)
 
