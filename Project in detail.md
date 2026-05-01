@@ -51,8 +51,6 @@ Confidence-based prediction filtering
 
 Source discrepancy identification
 
-Temporal trend analysis
-
 Interactive Streamlit web application
 
 Here comes the coding part:
