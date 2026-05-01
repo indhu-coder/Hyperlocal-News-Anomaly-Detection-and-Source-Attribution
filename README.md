@@ -1,5 +1,6 @@
 With the rapid growth of hyperlocal news platforms, ensuring the authenticity and consistency of news content has become increasingly challenging. News articles may exhibit inconsistencies between their reported publication location and their underlying linguistic patterns, sentiment, or thematic content. Such discrepancies can indicate potential misattribution, misleading information, or unusual narrative shifts.
 
+
 This project aims to develop an **advanced Natural Language Processing (NLP) system** capable of:
 
 * Detecting **anomalous linguistic patterns** in news articles
