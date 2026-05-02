@@ -13,13 +13,11 @@ COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir -r requirements.txt
 
 # Install spaCy small model (IMPORTANT)
 RUN python -m spacy download en_core_web_sm
-
-#Install CPU-only PyTorch
-RUN pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu
 
 # Copy all files
 COPY . .
