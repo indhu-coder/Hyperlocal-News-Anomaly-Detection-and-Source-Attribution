@@ -18,6 +18,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Install spaCy small model (IMPORTANT)
 RUN python -m spacy download en_core_web_sm
 
+#Install CPU-only PyTorch
+RUN pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu
+
 # Copy all files
 COPY . .
 
