@@ -7,6 +7,5 @@ spacy
 vaderSentiment
 joblib
 matplotlib
-torch==2.2.2
 xgboost
 
