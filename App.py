@@ -12,7 +12,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
 
-st.markdown("## 📰 AI News Anomaly Detection Dashboard")
+st.markdown("## 📰 News Anomaly Detection Dashboard")
 
 
 
