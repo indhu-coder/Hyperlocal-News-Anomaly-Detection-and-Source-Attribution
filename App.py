@@ -34,13 +34,6 @@ def load_models():
 model, le, embedder, mean_embedding, iso_model, nlp, loc_stats,scaler,pca,analyzer = load_models()
 
 @st.cache_data
-def load_data():
-    df_csv = pd.read_csv("Articles.csv", encoding="latin1")
-    return df_csv
-
-df_csv = load_data()
-
-@st.cache_data
 def get_embedding(text):
     return embedder.encode([text]).astype(np.float32)
 
@@ -129,7 +122,7 @@ tab1, tab2 = st.tabs(["🔍 Live Analysis", "📊 Model Insights"])
 
 with tab1:
 
-    mode = st.radio("Choose Input Mode", ["Enter News Article", "Select from Dataset"])
+    mode = st.radio("Choose Input Mode", ["Enter News Article"])
 
     user_text = None
 
@@ -137,11 +130,6 @@ with tab1:
         input_text = st.text_area("Enter news article here:")
         if input_text:
             user_text = input_text
-
-    elif mode == "Select from Dataset":
-        selected = st.selectbox("Select article", df_csv['Article'])
-        if selected:
-            user_text = selected
 
     if st.button("Analyze") and user_text:
     # ensure string
