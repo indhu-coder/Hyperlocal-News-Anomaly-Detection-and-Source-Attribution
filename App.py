@@ -25,7 +25,7 @@ def load_models():
     mean_embedding = joblib.load("mean_embedding.pkl")
     iso_model = joblib.load("iso_model.pkl")
     embedder = SentenceTransformer("all-MiniLM-L6-v2")
-    loc_stats = joblib.load("loc_stats.pkl")
+    loc_stats = pd.read_csv("loc_stats.csv")
     nlp = spacy.load("en_core_web_sm")
     analyzer = SentimentIntensityAnalyzer()
 
