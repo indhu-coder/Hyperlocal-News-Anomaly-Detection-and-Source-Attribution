@@ -18,7 +18,7 @@ COPY requirements.txt .
 # IMPORTANT: remove torch from requirements.txt to avoid CUDA/GPU install
 RUN pip install --upgrade pip && \
     pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu && \
-    pip install -r requirements.txt && \
+    pip install --no-cache-dir --prefer-binary -r requirements.txt && \
     python -m spacy download en_core_web_sm
 
 # Copy project files
