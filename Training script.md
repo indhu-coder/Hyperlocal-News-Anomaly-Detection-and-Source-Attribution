@@ -62,16 +62,11 @@ Here comes the coding part:
     import joblib
     import pandas as pd
     import numpy as np
-    import nltk
-    from nltk.tokenize import word_tokenize
-    from nltk.corpus import stopwords
-    from nltk.stem import WordNetLemmatizer
     import spacy
     import re
     import seaborn as sns
     import matplotlib.pyplot as plt
     from sklearn.ensemble import IsolationForest
-    from prophet import Prophet
     import xgboost as xgb
     from xgboost import XGBClassifier,callback
     from sklearn.model_selection import train_test_split
@@ -112,7 +107,7 @@ Here comes the coding part:
         # -------------------------------
         # 3. LOAD SPACY MODEL
         # -------------------------------
-        nlp = spacy.load("en_core_web_md")  
+        nlp = spacy.load("en_core_web_sm")  
         
         # -------------------------------
         # 4. LOCATION EXTRACTION
@@ -208,6 +203,7 @@ Here comes the coding part:
                 features.append(region_score)
         
             return features
+
         df['location'] = df['location'].apply(normalize_location)
         
         # -------------------------------
@@ -244,9 +240,7 @@ Here comes the coding part:
     def minmax(x):
     return (x - x.min()) / (x.max() - x.min() + 1e-6)
 
-        
-
-          df['anomaly_score_norm'] = 0.0
+        df['anomaly_score_norm'] = 0.0
         df['iso_score'] = 0.0
         df['final_score'] = 0.0
         embeddings = model.encode(df['text'].tolist(), show_progress_bar=True)
