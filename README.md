@@ -14,7 +14,7 @@ The system leverages a combination of:
 * **Topic modeling**
 * **Named Entity Recognition (NER) for location extraction**
 * **Hybrid anomaly detection techniques**
-* **Time-series analysis for temporal pattern shifts**
+* **Statistical process Control**
 
 By integrating these components, the system evaluates whether a news article aligns with the expected characteristics of its claimed origin. Articles that significantly deviate from learned patterns are flagged as **potential anomalies**, enabling the detection of misleading, inconsistent, or unusual news events.
 
