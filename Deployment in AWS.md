@@ -61,7 +61,18 @@ The application is deployed on an **AWS EC2 instance** using Docker for portabil
      ```
      http://<EC2-Public-IP>:8501
      ```
+8. **Saving the image and pushing to Dockerhub(optional)
 
+   * Open account in dockerhub site:
+      ---
+         docker push news-anomaly-app
+      ---
+     -->Repository creats and pushes the image to dockerhub .
+     
+     >>In future lets call the docker and pull the image for productions.
+      ---
+         docker pull news-anomaly-app
+      ---
 ---
 
 ### 🧠 Benefits of This Setup
