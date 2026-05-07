@@ -8,7 +8,7 @@ The application is deployed on an **AWS EC2 instance** using Docker for portabil
 
 * **Cloud Platform:** AWS EC2 (t3.micro)
 * **Containerization:** Docker
-* **File Transfer:** WinSCP
+* **File Transfer:** Git clone
 * **App Framework:** Streamlit
 
 ---
@@ -40,7 +40,7 @@ The application is deployed on an **AWS EC2 instance** using Docker for portabil
 
 4. **Transfer Project Files**
 
-   * Use WinSCP to upload project folder to EC2 instance
+   * Use git clone for tranferring files from local system to EC2.
 
 5. **Build Docker Image**
 
@@ -76,6 +76,7 @@ The application is deployed on an **AWS EC2 instance** using Docker for portabil
 ### 📌 Notes
 
 * Ensure required ports are open in EC2 security groups
+* Ensure enough space in disk for loading the models.
 * Keep Docker image optimized for faster startup
 * Use `--restart always` in production for reliability
 
